@@ -32,8 +32,6 @@ async def websocket_endpoint(websocket: WebSocket):
     while True:
         model.step()
 
-        await websocket.send_json({
-            model.get_state()
-        })
+        await websocket.send_json(model.get_state())
 
         await asyncio.sleep(0.1)    
