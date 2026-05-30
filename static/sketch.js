@@ -25,7 +25,7 @@ let serverTLState = { 1: "RED", 2: "RED", 3: "RED", 4: "RED", 5: "RED" };
 let serverGateClosed = false;
 let serverTrainState = 0;
 
-let s_volume, s_kereta, s_lampu, s_angkot;
+let s_volume, s_kereta, s_lampu, s_angkot, s_react;
 
 function setup() {
   let canvas = createCanvas(800, 600);
@@ -36,11 +36,16 @@ function setup() {
   s_kereta = document.getElementById("sliderKereta");
   s_lampu = document.getElementById("sliderLampu");
   s_angkot = document.getElementById("sliderAngkot");
+  s_react = document.getElementById("sliderReact");
 
   s_volume.oninput = () => (document.getElementById("valVolume").innerText = s_volume.value > 10 ? "Padat" : s_volume.value < 4 ? "Sepi" : "Sedang");
   s_kereta.oninput = () => (document.getElementById("valKereta").innerText = s_kereta.value < 400 ? "Sering" : s_kereta.value > 1000 ? "Jarang" : "Normal");
   s_lampu.oninput = () => (document.getElementById("valLampu").innerText = s_lampu.value + " tick");
   s_angkot.oninput = () => (document.getElementById("valAngkot").innerText = s_angkot.value + "%");
+
+  s_react.oninput = () => {
+    document.getElementById("valReact").innerText = parseFloat(s_react.value).toFixed(1) + " Detik";
+  };
 
   socket = io();
 
@@ -88,7 +93,8 @@ function draw() {
       volume: s_volume.value,
       kereta: s_kereta.value,
       lampu: s_lampu.value,
-      angkot: s_angkot.value
+      angkot: s_angkot.value,
+      reaction: s_react.value
     });
   }
 
@@ -191,7 +197,7 @@ function drawVehicles() {
     noStroke(); fill(254, 240, 138, 70);
     triangle(10, 0, 35, -12, 35, 12);
 
-    // Brake Lights (Lampu Rem Belakang Menyala Merah Saat Berhenti/Ngetem)
+    // Brake Lights (Lampu Rem Belakang Menyala Merah Saat Berhenti)
     if (isStopping || v.is_parking) {
       fill(239, 68, 68, 200);
       ellipse(-10, -3, 3, 3);

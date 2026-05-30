@@ -20,6 +20,9 @@ def handle_step(data):
         traffic_model.light_val = int(data.get("light", traffic_model.light_val))
         traffic_model.angkot_val = int(data.get("angkot", traffic_model.angkot_val))
 
+        raw_seconds = float(data.get("reaction", 2.1))
+        traffic_model.reaction_val = int(raw_seconds*20)
+
     traffic_model.step()
 
     agent_data = []

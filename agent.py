@@ -14,6 +14,9 @@ class VehicleAgent(Agent):
         self.is_parking = False
         self.park_timer = 0
 
+        self.current_must_stop = False
+        self.reaction_counter = 0
+
     def step(self):
         if self.t_idx >= len(self.route):
             self.model.remove_queue.append(self)
@@ -35,11 +38,11 @@ class VehicleAgent(Agent):
         dx = target["x"] - self.x
         dy = target["y"] - self.y
         dist_to_target = (dx**2 + dy**2)**0.5
-        must_stop = False
+        perceived_stop = False
 
         if target["type"] == "TL":
             if self.model.tl_state[str(target["id"])] == "RED" and dist_to_target < 35:
-                must_stop = True
+                perceived_stop = True
             
         for other in self.model.agents:
             if other == self or other.t_idx >= len(other.route):
@@ -50,9 +53,17 @@ class VehicleAgent(Agent):
                 other_dy = target["y"] - other.y
                 other_dist = (other_dx**2 + other_dy**2)**0.5
                 if other.is_parking or other_dist < dist_to_target:
-                    must_stop = True
+                    perceived_stop = True
 
-        if not must_stop:
+        if perceived_stop != self.current_must_stop:
+            self.reaction_counter += 1
+            if self.reaction_counter >= self.model.reaction_val:
+                self.current_must_stop = perceived_stop
+                self.reaction_counter = 0
+        else:
+            self.reaction_counter = 0
+
+        if not self.current_must_stop:
             if dist_to_target > self.speed:
                 self.x += (dx / dist_to_target) * self.speed
                 self.y += (dy / dist_to_target) * self.speed
@@ -60,5 +71,4 @@ class VehicleAgent(Agent):
                 self.x = target["x"]
                 self.y = target["y"]
                 self.t_idx += 1
-
     

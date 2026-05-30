@@ -19,6 +19,9 @@ class TrafficModel(Model):
         self.train_progress = 0.0
         self.remove_queue = []
 
+        # Convert 2.1s into ticks (2.1 * 20 = 42) as default value
+        self.reaction_val = 42
+
     def step(self):
         spawn_rate = self.volume_val / 100.0
         if random.random() < spawn_rate:
